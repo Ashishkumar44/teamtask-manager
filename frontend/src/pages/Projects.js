@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { projectService } from '../services/api';
 import './Projects.css';
@@ -15,11 +15,7 @@ const Projects = () => {
     endDate: '',
   });
 
-  useEffect(() => {
-    fetchProjects();
-  }, [token]);
-
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       const response = await projectService.getProjects(token);
       setProjects(response.data.projects);
@@ -28,7 +24,11 @@ const Projects = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

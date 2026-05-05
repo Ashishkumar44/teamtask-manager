@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext();
@@ -8,15 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
 
-  useEffect(() => {
-    if (token) {
-      checkAuth();
-    } else {
-      setLoading(false);
-    }
-  }, [token]);
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const response = await axios.get('/api/auth/me', {
         headers: { Authorization: `Bearer ${token}` },
@@ -28,7 +20,15 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      checkAuth();
+    } else {
+      setLoading(false);
+    }
+  }, [checkAuth, token]);
 
   const signup = async (name, email, password, confirmPassword) => {
     try {

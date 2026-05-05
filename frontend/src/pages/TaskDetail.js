@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { taskService } from '../services/api';
@@ -7,7 +7,7 @@ import './TaskDetail.css';
 const TaskDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, token } = useAuth();
+  const { token } = useAuth();
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -21,11 +21,7 @@ const TaskDetail = () => {
     dueDate: '',
   });
 
-  useEffect(() => {
-    fetchTask();
-  }, [id, token]);
-
-  const fetchTask = async () => {
+  const fetchTask = useCallback(async () => {
     try {
       const response = await taskService.getTask(id, token);
       setTask(response.data.task);
@@ -43,7 +39,11 @@ const TaskDetail = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, token]);
+
+  useEffect(() => {
+    fetchTask();
+  }, [fetchTask]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

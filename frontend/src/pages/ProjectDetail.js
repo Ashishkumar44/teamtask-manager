@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { projectService, taskService } from '../services/api';
@@ -27,11 +27,7 @@ const ProjectDetail = () => {
   });
   const [filterStatus, setFilterStatus] = useState('All');
 
-  useEffect(() => {
-    fetchProjectData();
-  }, [id, token]);
-
-  const fetchProjectData = async () => {
+  const fetchProjectData = useCallback(async () => {
     try {
       const [projectRes, tasksRes] = await Promise.all([
         projectService.getProject(id, token),
@@ -44,7 +40,11 @@ const ProjectDetail = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, token]);
+
+  useEffect(() => {
+    fetchProjectData();
+  }, [fetchProjectData]);
 
   const handleTaskChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
