@@ -2,6 +2,9 @@
   "name": "team-task-manager",
   "private": true,
   "version": "1.0.0",
+  "engines": {
+    "node": ">=20 <21"
+  },
   "scripts": {
     "install:frontend": "npm --prefix frontend install",
     "build": "npm run install:frontend && npm --prefix frontend run build",
